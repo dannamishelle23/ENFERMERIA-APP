@@ -31,7 +31,18 @@ const enfermeroSchema = new Schema({
     },
     password:{
         type:String,
-        required:true
+        required: function () {
+            return !this.isOAuth;  // la contraseña es obligatoria si el usuario no se registró mediante OAuth
+            },
+    },
+    isOAuth: {
+        type: Boolean,
+        default: false,
+    },
+    oauthProvider: {
+        type: String,
+            enum: ['google', null],
+            default: null,
     },
     status:{
         type:Boolean,
@@ -67,7 +78,6 @@ const enfermeroSchema = new Schema({
 },{
     timestamps:true
 })
-
 
 // Método para cifrar el password
 enfermeroSchema.methods.encryptPassword = async function(password){
