@@ -32,6 +32,13 @@ const administradorSchema = new Schema({
         type:String,
         required:true
     },
+    fotoPerfilAdmin: {
+    type: String,
+    default: "https://cdn-icons-png.flaticon.com/512/4715/4715329.png"  //Enviar un icono por defecto
+    },
+    fotoPerfilAdminID: { // ID de Cloudinary para poder eliminarla/reemplazarla
+        type: String
+    },
     status:{
         type:Boolean,
         default:true
@@ -51,7 +58,6 @@ const administradorSchema = new Schema({
 },{
     timestamps:true
 })
-
 
 // Método para cifrar el password
 administradorSchema.methods.encryptPassword = async function(password){
