@@ -1,5 +1,5 @@
 import {Router} from "express"
-import { registroAdministrador, confirmarMailAdministrador, recuperarPasswordAdministrador,
+import { registrarAdministrador, confirmarMailAdministrador, recuperarPasswordAdministrador,
     comprobarTokenPasword, crearNuevoPasswordAdministrador,loginAdministrador,perfilAdministrador,
     actualizarPasswordAdministrador,
     } from "../controllers/administrador_controller.js"
@@ -7,17 +7,17 @@ import { registroAdministrador, confirmarMailAdministrador, recuperarPasswordAdm
 const router = Router()
 
 //Registro
-router.post('/administrador/registro', registroAdministrador)
+router.post('/administrador/registro', registrarAdministrador)
 
 //Confirmacion cuenta 
-router.get('/enfermero/confirmar/:token',confirmarMailAdministrador)
+router.get('/administrador/confirmar/:token',confirmarMailAdministrador)
 
 //Recuperacion contraseña
-router.post('/enfermero/recuperar-passowrd', recuperarPasswordAdministrador)
-router.get('/enfermero/recuperar-password/:token',comprobarTokenPasword)
+router.post('/administrador/recuperar-passowrd', recuperarPasswordAdministrador)
+router.get('/administrador/recuperar-password/:token',comprobarTokenPasword)
 
 //Nueva contraseña para reestablecer cuenta
-router.post('/enfermero/nuevopassword/:token',crearNuevoPasswordAdministrador)
+router.post('/administrador/nuevopassword/:token',crearNuevoPasswordAdministrador)
 
 //Login
 router.post('/administrador/login', loginAdministrador)

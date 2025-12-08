@@ -5,24 +5,40 @@ import fs from "fs-extra";
 import mongoose from 'mongoose';
 
 //Paso 1: Registro de los datos básicos de los enfermeros
-const registroAdministrador = async(req, res) => {
-    try {
-        const {email, password} = req.body
-        // Validación de campos obligatorios
-        if (!nombre || !apellido || !email || !password) return res.status(400).json({msg: "Debes completar todos los campos de manera obligatoria."})
-        const verificarEmailBDD = await Administrador.findOne({email})
-        if(verificarEmailBDD) return res.status(400).json({msg: "Lo sentimos, el email ya se encuentra registrado."})
-        const nuevoAdministrador = new Administrador({nombre, apellido, email, password})
-        nuevoAdministrador.password = await nuevoAdministrador.encryptPassword(password)
-        const token = nuevoAdministrador.createToken()
-        await sendMailToRegisterAdmin(email,token)
-        await nuevoAdministrador.save()
-        //Retornar ID para el siguiente formulario
-        res.status(200).json({msg: "Datos registrados con éxito. Revisa tu correo electrónico para confirmar tu cuenta.", administradorId: nuevoAdministrador._id})
-    } catch (error) {
-        res.status(500).json({msg: "Error en el servidor."})
+const registrarAdministrador = async () => {
+  try {
+    const emailAdmin = "dannamishelle.53@gmail.com";  //Correo del administrador principal
+
+    // Buscar si ya existe ese correo
+    const admin = await Administrador.findOne({ email: emailAdmin });
+    if (!admin) {
+      const passwordGenerada = "Welcome-1234567$";
+      const nuevoAdmin = new Administrador({
+        nombreAdministrador: "Danna Lopez",
+        email: emailAdmin,
+        password: await new Administrador().encrypPassword(passwordGenerada),
+        confirmEmail: true,
+      });
+      await nuevoAdmin.save();
+      console.log("Administrador registrado con éxito.");
+
+      // Enviar correo con las credenciales
+      await sendMailWithCredentials(
+        nuevoAdmin.email,
+        nuevoAdmin.nombreAdministrador,
+        passwordGenerada
+      );
+    } else {
+      console.log("El administrador ya se encuentra registrado en la base de datos.");
     }
-}
+  } catch (error) {
+    if (error.code === 11000) {
+      console.log("El administrador ya existe, no se volverá a crear.");
+    } else {
+      console.error("Error al registrar administrador:", error);
+    }
+  }
+};
 
 //Paso 2: Confirmar email administrador
 const confirmarMailAdministrador = async (req, res) => {
@@ -149,7 +165,7 @@ const actualizarPasswordAdministrador = async (req, res) => {
 
 
 export {
-    registroAdministrador,
+    registrarAdministrador,
     confirmarMailAdministrador,
     recuperarPasswordAdministrador,
     comprobarTokenPasword,
