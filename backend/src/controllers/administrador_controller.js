@@ -156,7 +156,6 @@ const actualizarPasswordAdministrador = async (req, res) => {
 
 export {
     registrarAdministrador,
-    confirmarMailAdministrador,
     recuperarPasswordAdministrador,
     comprobarTokenPasword,
     crearNuevoPasswordAdministrador,
