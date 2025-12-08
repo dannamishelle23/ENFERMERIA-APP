@@ -9,9 +9,6 @@ const router = Router()
 //Registro
 router.post('/administrador/registro', registrarAdministrador)
 
-//Confirmacion cuenta 
-router.get('/administrador/confirmar/:token',confirmarMailAdministrador)
-
 //Recuperacion contraseña
 router.post('/administrador/recuperar-passowrd', recuperarPasswordAdministrador)
 router.get('/administrador/recuperar-password/:token',comprobarTokenPasword)

@@ -2,7 +2,7 @@ import {Schema, model} from 'mongoose'
 import bcrypt from "bcryptjs"
 
 const administradorSchema = new Schema({
-    nombre:{
+    nombreAdministrador:{
         type:String,
         required:true,
         trim:true
