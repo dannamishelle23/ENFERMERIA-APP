@@ -1,10 +1,10 @@
 import Administrador from '../models/Administrador.js';
-import { sendMailToRecoveryPassword, sendMailToRegisterAdmin } from '../config/nodemailer.js';
+import { sendMailToRecoveryPassword, sendMailWithCredentials } from '../config/nodemailer.js';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs-extra";
 import mongoose from 'mongoose';
 
-//Paso 1: Registro de los datos básicos de los enfermeros
+//Paso 1: Registro del administrador en la base de datos
 const registrarAdministrador = async () => {
   try {
     const emailAdmin = "dannamishelle.53@gmail.com";  //Correo del administrador principal
@@ -40,30 +40,18 @@ const registrarAdministrador = async () => {
   }
 };
 
-//Paso 2: Confirmar email administrador
-const confirmarMailAdministrador = async (req, res) => {
-    try {
-        const { token } = req.params
-        const administradorBDD = await Administrador.findOne({ token })
-        if (!administradorBDD) return res.status(404).json({ msg: "Token inválido o cuenta ya confirmada" })
-        administradorBDD.token = null
-        administradorBDD.confirmEmail = true
-        await administradorBDD.save()
-        res.status(200).json({ msg: "Su cuenta ha sido confirmada, ya puede iniciar sesión" })
-
-    } catch (error) {
-    console.error(error)
-        res.status(500).json({ msg: `Error en el servidor - ${error}` })
-    }
-}
-
 //Recuperacion de contraseña en caso de olvido
 const recuperarPasswordAdministrador = async(req, res) => {
   try {
     const {email} = req.body;
-    if(!email) return res.status(400).json({msg: "Debes ingresar un correo de manera obligatoria."})
+    if (Object.values(req.body).includes(""))
+      return res.status(400).json({msg:"Todos los campos deben ser llenados de manera obligatoria"});
+    
+    //Verificar si el email existe en la base de datos
     const administradorBDD = await Administrador.findOne({email})
     if (!administradorBDD) return res.status(400).json({msg: "El usuario no se encuentra registrado."})
+    
+    //Generar token y enviar email de confirmación
     const token = administradorBDD.createToken()
     administradorBDD.token = token
     await sendMailToRecoveryPassword(email, token)
@@ -75,13 +63,15 @@ const recuperarPasswordAdministrador = async(req, res) => {
     }
 }
 
+//Comprobar el token para reestablecer la contraseña
 const comprobarTokenPasword = async (req,res)=>{
     try {
         const {token} = req.params
         const administradorBDD = await Administrador.findOne({token})
-        if(administradorBDD?.token !== token) return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
-        res.status(200).json({msg:"Token confirmado, ya puedes crear una nueva contraseña."}) 
-    
+        if(!administradorBDD || administradorBDD?.token !== token) 
+          return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
+        await administradorBDD.save();
+        res.status(200).json({msg:"Token confirmado, puedes crear una nueva contraseña."}) 
     } catch (error) {
         console.error(error)
         res.status(500).json({ msg: `Error en el servidor - ${error}` })
@@ -101,7 +91,7 @@ const crearNuevoPasswordAdministrador = async (req,res)=>{
         administradorBDD.token = null
         administradorBDD.password = await administradorBDD.encryptPassword(password)
         await administradorBDD.save()
-        res.status(200).json({msg:"Contraseña cambiada y reestablecida de manera exitosa."}) 
+        res.status(200).json({msg:"Contraseña cambiada de manera exitosa. Ahora puedes iniciar sesión."}) 
     } catch (error) {
         console.error(error)
         res.status(500).json({ msg: `Error en el servidor - ${error}` })
