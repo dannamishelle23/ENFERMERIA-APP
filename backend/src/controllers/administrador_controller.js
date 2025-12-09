@@ -138,6 +138,55 @@ const perfilAdministrador = (req, res) => {
   res.status(200).json(datosPerfil);
 };
 
+//Actualizar Pefil
+const actualizarPerfilAdministrador = async (req, res) => {
+  const {id} = req.params;
+  const {nombreAdministrador, email} = req.body;
+
+  //Verificar que el ID de administrador sea válido
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "ID de administrador no válido." });
+  }
+
+  const administradorBDD = await Administrador.findById(id);
+  if (!administradorBDD) {
+    return res.status(404).json({ msg: `Lo sentimos, no exuste el administrador ${id}.` });
+  }
+
+  if (email && administradorBDD.email !== email) {
+    const administradorBDDMail = await Administrador.findOne({email});
+    if (administradorBDDMail) {
+      return res.status(400).json({ msg: "El correo electrónico ya está en uso por otro administrador." });
+    }
+    administradorBDD.email = email;
+  }
+
+  if (nombreAdministrador) {
+    administradorBDD.nombreAdministrador = nombreAdministrador;
+  }
+
+  if (req.files?.imagen) {
+    if (administradorBDD.fotoPerfilID) {
+      await cloudinary.uploader.destroy(administradorBDD.fotoPerfilID);
+    }
+
+  const {secure_url, public_id} = await cloudinary.uploader.upload(
+    req.files.imagen.tempFilePath, 
+    {folder: "Administradores"}
+  );
+
+  administradorBDD.fotoPerfilAdmin = secure_url;
+  administradorBDD.fotoPerfilID = public_id;
+  await fs.remove(req.files.imagen.tempFilePath);
+  }
+
+  await administradorBDD.save();
+  res.status(200).json({ 
+    msg: "Perfil de administrador actualizado correctamente.",
+    administrador: administradorBDD,
+   });
+};
+
 // Actualizar contraseña
 const actualizarPasswordAdministrador = async (req, res) => {
   const administradorBDD = await Administrador.findById(req.administradorBDD._id);
@@ -162,5 +211,6 @@ export {
     crearNuevoPasswordAdministrador,
     loginAdministrador,
     perfilAdministrador,
+    actualizarPerfilAdministrador,
     actualizarPasswordAdministrador
 }
