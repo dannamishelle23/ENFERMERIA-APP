@@ -14,15 +14,15 @@ const transporter = nodemailer.createTransport({
 })
 
 //Email de envío de credenciales para administrador
-const sendMailWithCredentials = async (email, nombreAdministrador, passwordGenerada) => {
+const sendMailWithCredentialsAdmin = async (nombreAdministrador, apellido, email, passwordGenerada) => {
   try {
     let mailOptions = {
-      from: "Enfermería APP <no-reply@tutorias-esfot.com>",
+      from: "Enfermería APP <no-reply@enfermeria-app@gmail.com>",
       to: email,
       subject: "🔐 Credenciales de Administrador - Enfermería-APP",
       html: `
         <div style="font-family: Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; text-align: center; background-color: #fafafa;">
-          <h2 style="color: #81180aff; font-weight: bold;">¡Bienvenido/a, ${nombreAdministrador}!</h2>
+          <h2 style="color: #81180aff; font-weight: bold;">¡Bienvenido/a, ${nombreAdministrador}, ${apellido}!</h2>
           <p style="font-size: 16px; color: #333;">
             Se ha creado tu cuenta de <strong>Administrador</strong> en la plataforma de Enfermería.
           </p>
@@ -37,7 +37,7 @@ const sendMailWithCredentials = async (email, nombreAdministrador, passwordGener
           </p>
           <hr style="border: 0; border-top: 1px solid #424040ff; margin: 20px 0;">
           <footer style="font-size: 12px; color: #999;">
-            <p>&copy; 2025 ESFOT Tutorías. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Enfermería APP. Todos los derechos reservados.</p>
           </footer>
         </div>
       `,
@@ -87,7 +87,7 @@ const sendMailToRecoveryPassword = (userMail, token) => {
 }
 
 export {
-    sendMailWithCredentials,
+    sendMailWithCredentialsAdmin,
     sendMailToRegister,
     sendMailToRecoveryPassword
 }

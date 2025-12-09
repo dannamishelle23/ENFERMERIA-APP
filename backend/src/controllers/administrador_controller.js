@@ -1,32 +1,34 @@
 import Administrador from '../models/Administrador.js';
-import { sendMailToRecoveryPassword, sendMailWithCredentials } from '../config/nodemailer.js';
+import { sendMailWithCredentialsAdmin,sendMailToRecoveryPassword } from '../config/nodemailer.js';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs-extra";
+import { crearTokenJWT } from "../middlewares/JWT.js";
 import mongoose from 'mongoose';
 
 //Paso 1: Registro del administrador en la base de datos
 const registrarAdministrador = async () => {
   try {
     const emailAdmin = "dannamishelle.53@gmail.com";  //Correo del administrador principal
-
     // Buscar si ya existe ese correo
     const admin = await Administrador.findOne({ email: emailAdmin });
     if (!admin) {
       const passwordGenerada = "Welcome-1234567$";
       const nuevoAdmin = new Administrador({
-        nombreAdministrador: "Danna Lopez",
+        nombreAdministrador: "Danna",
+        apellido: "Lopez",
         email: emailAdmin,
-        password: await new Administrador().encrypPassword(passwordGenerada),
+        password: await new Administrador().encryptPassword(passwordGenerada),
         confirmEmail: true,
       });
       await nuevoAdmin.save();
       console.log("Administrador registrado con éxito.");
 
       // Enviar correo con las credenciales
-      await sendMailWithCredentials(
-        nuevoAdmin.email,
-        nuevoAdmin.nombreAdministrador,
-        passwordGenerada
+      await sendMailWithCredentialsAdmin(
+          nuevoAdmin.nombreAdministrador,
+          nuevoAdmin.apellido,
+          nuevoAdmin.email,
+          passwordGenerada
       );
     } else {
       console.log("El administrador ya se encuentra registrado en la base de datos.");
@@ -80,14 +82,15 @@ const comprobarTokenPasword = async (req,res)=>{
 
 //Crear una nueva contraseña para reestablecer la cuenta
 const crearNuevoPasswordAdministrador = async (req,res)=>{
-
     try {
         const{password,confirmpassword} = req.body
-        const { token } = req.params
-        if (Object.values(req.body).includes("")) return res.status(404).json({msg:"Debes llenar todos los campos"})
-        if(password !== confirmpassword) return res.status(404).json({msg:"Las contraseñas que has ingresado no coinciden."})
-        const administradorBDD = await Administrador.findOne({token})
-        if(!administradorBDD) return res.status(404).json({msg:"No se puede validar la cuenta"})
+        if (Object.values(req.body).includes("")) 
+          return res.status(404).json({msg:"Todos los campos deben ser llenados de forma obligatoria."})
+        if(password !== confirmpassword) 
+          return res.status(404).json({msg:"Las contraseñas que has ingresado no coinciden."})
+        const administradorBDD = await Administrador.findOne({token: req.params.token})
+        if(!administradorBDD || administradorBDD.token !== req.params.token) 
+          return res.status(404).json({msg:"Lo sentimos, no se puede validar la cuenta"})
         administradorBDD.token = null
         administradorBDD.password = await administradorBDD.encryptPassword(password)
         await administradorBDD.save()
