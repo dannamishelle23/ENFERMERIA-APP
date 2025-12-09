@@ -14,8 +14,7 @@ const registrarAdministrador = async () => {
     if (!admin) {
       const passwordGenerada = "Welcome-1234567$";
       const nuevoAdmin = new Administrador({
-        nombreAdministrador: "Danna",
-        apellido: "Lopez",
+        nombreAdministrador: "Danna Lopez",
         email: emailAdmin,
         password: await new Administrador().encryptPassword(passwordGenerada),
         confirmEmail: true,
@@ -26,7 +25,6 @@ const registrarAdministrador = async () => {
       // Enviar correo con las credenciales
       await sendMailWithCredentialsAdmin(
           nuevoAdmin.nombreAdministrador,
-          nuevoAdmin.apellido,
           nuevoAdmin.email,
           passwordGenerada
       );

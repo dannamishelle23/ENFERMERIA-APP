@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 })
 
 //Email de envío de credenciales para administrador
-const sendMailWithCredentialsAdmin = async (nombreAdministrador, apellido, email, passwordGenerada) => {
+const sendMailWithCredentialsAdmin = async (nombreAdministrador, email, passwordGenerada) => {
   try {
     let mailOptions = {
       from: "Enfermería APP <no-reply@enfermeria-app@gmail.com>",
@@ -22,7 +22,7 @@ const sendMailWithCredentialsAdmin = async (nombreAdministrador, apellido, email
       subject: "🔐 Credenciales de Administrador - Enfermería-APP",
       html: `
         <div style="font-family: Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; padding: 20px; text-align: center; background-color: #fafafa;">
-          <h2 style="color: #81180aff; font-weight: bold;">¡Bienvenido/a, ${nombreAdministrador}, ${apellido}!</h2>
+          <h2 style="color: #81180aff; font-weight: bold;">¡Bienvenido/a, ${nombreAdministrador}!</h2>
           <p style="font-size: 16px; color: #333;">
             Se ha creado tu cuenta de <strong>Administrador</strong> en la plataforma de Enfermería.
           </p>

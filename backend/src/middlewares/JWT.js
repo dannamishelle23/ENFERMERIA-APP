@@ -19,7 +19,7 @@ const verificarTokenJWT = async (req, res, next) => {
         }
         else if (rol === "Enfermero") {
             req.enfermeroBDD = await Enfermero.findById(id).lean().select("-password");
-            //console.log("Docente encontrado:", req.docenteBDD)
+            //console.log("enfermero encontrado:", req.enfermeroBDD)
         } else {
             return res.status(403).json({ msg: "Usuario no encontrado o no autorizado." });
         }

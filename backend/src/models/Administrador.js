@@ -7,11 +7,6 @@ const administradorSchema = new Schema({
         required:true,
         trim:true
     },
-    apellido:{
-        type:String,
-        required:true,
-        trim:true
-    },
     direccion:{
         type:String,
         trim:true,
